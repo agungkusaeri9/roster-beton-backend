@@ -49,3 +49,71 @@ go get github.com/lib/pq
 go get github.com/joho/godotenv
 go get github.com/jmoiron/sqlx
 ```
+
+---
+
+## 🔐 Environment Variables
+
+Buat file `.env` di root project dengan konfigurasi berikut (lihat `.env.example`):
+
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_PORT=5432
+DB_NAME=go_arch
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+TOKEN_EXPIRY=24h  # Format: 24h, 1h, 30m, etc.
+```
+
+**Catatan:**
+
+- `JWT_SECRET` **WAJIB** diisi dengan secret key yang kuat (minimal 32 karakter)
+- `TOKEN_EXPIRY` menggunakan format Go duration (contoh: `24h`, `1h`, `30m`, `720h` untuk 30 hari)
+- Jika `TOKEN_EXPIRY` tidak di-set, default akan menggunakan `24h`
+
+---
+
+## 🔒 Security Best Practices
+
+### ⚠️ File Sensitif - JANGAN COMMIT!
+
+File-file berikut **TIDAK BOLEH** di-commit ke repository:
+
+- ✅ `.env` - Environment variables (sudah di-ignore)
+- ✅ File dengan kata `secret`, `key`, `credential`, `password`
+- ✅ File certificate/keys (`.pem`, `.key`, `.crt`, `.cert`)
+- ✅ Database dumps dan backups (`.sql`, `.dump`, `.backup`)
+- ✅ Log files yang mungkin mengandung informasi sensitif
+
+### ✅ Yang BOLEH di-commit:
+
+- ✅ `.env.example` - Template environment variables (tanpa nilai sensitif)
+- ✅ Migration files di folder `migrations/`
+- ✅ Source code dan dokumentasi
+
+### 🛡️ Checklist Sebelum Commit:
+
+1. ✅ Pastikan file `.env` tidak ter-track: `git status | grep .env`
+2. ✅ Pastikan tidak ada credential hardcoded di source code
+3. ✅ Pastikan JWT_SECRET menggunakan environment variable
+4. ✅ Review perubahan dengan: `git diff` sebelum commit
+
+### 🔧 Jika File Sensitif Terlanjur Ter-commit:
+
+Jika file sensitif sudah ter-commit, segera:
+
+```bash
+# Hapus dari git tracking (tapi tetap di local)
+git rm --cached .env
+
+# Commit perubahan
+git commit -m "Remove sensitive .env file from tracking"
+
+# Jika sudah ter-push, ubah semua secrets yang ter-expose!
+```
+
+**⚠️ PENTING:** Jika file sensitif sudah ter-push ke GitHub, anggap semua credentials sudah compromised dan **WAJIB diganti**!

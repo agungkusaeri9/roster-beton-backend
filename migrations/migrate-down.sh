@@ -25,21 +25,17 @@ DATABASE_URL="postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NA
 # Find migrate binary
 MIGRATE_CMD="migrate"
 if ! command -v migrate &> /dev/null; then
-    # Try common Go bin paths
     if [ -f "$HOME/go/bin/migrate" ]; then
         MIGRATE_CMD="$HOME/go/bin/migrate"
     elif [ -f "/usr/local/go/bin/migrate" ]; then
         MIGRATE_CMD="/usr/local/go/bin/migrate"
     else
         echo "❌ Error: migrate command not found"
-        echo "Please install golang-migrate:"
-        echo "  go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest"
-        echo "Or add ~/go/bin to your PATH"
         exit 1
     fi
 fi
 
-# Run migration up
-echo "🚀 Running migrations..."
-echo "Database: $DB_NAME@$DB_HOST:$DB_PORT"
-$MIGRATE_CMD -path ./migrations -database "$DATABASE_URL" up
+# Run migration down
+echo "⬇️  Rolling back migrations..."
+$MIGRATE_CMD -path ./migrations -database "$DATABASE_URL" down
+

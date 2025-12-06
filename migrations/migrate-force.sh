@@ -22,24 +22,30 @@ DB_NAME=${DB_NAME:-go_arch}
 # PostgreSQL connection string
 DATABASE_URL="postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"
 
+# Check if version argument is provided
+if [ -z "$1" ]; then
+    echo "❌ Error: Version number is required"
+    echo "Usage: ./migrate-force.sh <version>"
+    echo "Example: ./migrate-force.sh 1"
+    exit 1
+fi
+
+VERSION=$1
+
 # Find migrate binary
 MIGRATE_CMD="migrate"
 if ! command -v migrate &> /dev/null; then
-    # Try common Go bin paths
     if [ -f "$HOME/go/bin/migrate" ]; then
         MIGRATE_CMD="$HOME/go/bin/migrate"
     elif [ -f "/usr/local/go/bin/migrate" ]; then
         MIGRATE_CMD="/usr/local/go/bin/migrate"
     else
         echo "❌ Error: migrate command not found"
-        echo "Please install golang-migrate:"
-        echo "  go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest"
-        echo "Or add ~/go/bin to your PATH"
         exit 1
     fi
 fi
 
-# Run migration up
-echo "🚀 Running migrations..."
-echo "Database: $DB_NAME@$DB_HOST:$DB_PORT"
-$MIGRATE_CMD -path ./migrations -database "$DATABASE_URL" up
+# Force migration to specific version
+echo "🔧 Forcing migration to version $VERSION..."
+$MIGRATE_CMD -path ./migrations -database "$DATABASE_URL" force $VERSION
+

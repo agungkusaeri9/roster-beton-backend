@@ -45,11 +45,16 @@ func (r *userRepo) GetByUsername(username string) (*entity.User, error) {
 }
 
 func (r *userRepo) Create(user *entity.User) (*entity.User, error) {
+	// Set default role if not provided
+	if user.Role == "" {
+		user.Role = "user"
+	}
+	
 	err := r.db.Get(user, `
-		INSERT INTO users (name, username, password)
-		VALUES ($1, $2, $3)
+		INSERT INTO users (name, username, password, role)
+		VALUES ($1, $2, $3, $4)
 		RETURNING *`,
-		user.Name, user.Username, user.Password,
+		user.Name, user.Username, user.Password, user.Role,
 	)
 	if err != nil {
 		return nil, err
@@ -60,10 +65,10 @@ func (r *userRepo) Create(user *entity.User) (*entity.User, error) {
 func (r *userRepo) Update(user *entity.User) (*entity.User, error) {
 	err := r.db.Get(user, `
 		UPDATE users
-		SET name = $1, username = $2, password = $3
-		WHERE id = $4
+		SET name = $1, username = $2, password = $3, role = $4, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $5
 		RETURNING *`,
-		user.Name, user.Username, user.Password, user.ID,
+		user.Name, user.Username, user.Password, user.Role, user.ID,
 	)
 	if err != nil {
 		return nil, err

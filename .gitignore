@@ -28,17 +28,52 @@ vendor/
 # ⚙️ Environment & Config Files
 # ==============================
 
-# Local environment variables
+# Local environment variables (SENSITIVE - DO NOT COMMIT)
 .env
+.env.*
+!.env.example
 .env.local
 .env.dev
+.env.development
 .env.prod
+.env.production
 .env.staging
+.env.test
+.env.backup
+.env.old
+*.env
 
-# App-specific config
+# App-specific config (if contains sensitive data)
 config.yaml
 config.yml
 settings.json
+appsettings.json
+appsettings.*.json
+!appsettings.example.json
+
+# Secrets and credentials (SENSITIVE - DO NOT COMMIT)
+*secret*
+*secrets*
+*key*
+*keys*
+*credential*
+*credentials*
+*password*
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+*.private
+*.pub
+private_key*
+public_key*
 
 # ==============================
 # 🗃️ Database & Migrations
@@ -52,6 +87,14 @@ migrations/*.log
 *.db
 *.sqlite
 *.sqlite3
+*.db-shm
+*.db-wal
+
+# Database dumps and backups (may contain sensitive data)
+*.sql
+*.dump
+*.backup
+!migrations/*.sql
 
 # ==============================
 # 🧪 Tests & Coverage
@@ -100,20 +143,51 @@ postgres_data/
 redis_data/
 
 # ==============================
+# 🔐 Security & Sensitive Files
+# ==============================
+
+# JWT tokens and session files
+*.token
+*.session
+sessions/
+
+# API keys and tokens
+api_keys.txt
+tokens.txt
+
+# Backup files (may contain sensitive data)
+*.backup
+*.bak
+*.old
+*.orig
+*~
+
+# ==============================
 # 🧰 Miscellaneous
 # ==============================
 
-# Logs
+# Logs (may contain sensitive information)
 *.log
 log/
 logs/
+*.log.*
 
 # Temporary / cache files
 *.tmp
-*.bak
-*.old
+*.cache
+.cache/
+tmp/
+temp/
+
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
 
 # ==============================
 # 🔥 Build Artifacts (Optional)
