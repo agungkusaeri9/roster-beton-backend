@@ -117,3 +117,110 @@ git commit -m "Remove sensitive .env file from tracking"
 ```
 
 **⚠️ PENTING:** Jika file sensitif sudah ter-push ke GitHub, anggap semua credentials sudah compromised dan **WAJIB diganti**!
+
+---
+
+## 🐳 Docker Setup
+
+### Prerequisites
+
+- Docker & Docker Compose terinstall
+- File `.env` sudah dikonfigurasi dengan benar
+
+### Quick Start
+
+1. **Build dan jalankan semua services:**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Cek status containers:**
+   ```bash
+   docker-compose ps
+   ```
+
+3. **Lihat logs:**
+   ```bash
+   # Semua services
+   docker-compose logs -f
+   
+   # Specific service
+   docker-compose logs -f app
+   docker-compose logs -f postgres
+   ```
+
+4. **Stop services:**
+   ```bash
+   docker-compose down
+   ```
+
+5. **Stop dan hapus volumes (data akan hilang):**
+   ```bash
+   docker-compose down -v
+   ```
+
+### Services
+
+- **postgres** - PostgreSQL database (port 5432)
+- **app** - Go application (port 8080)
+- **migrate** - Database migration service (runs automatically)
+
+### Manual Migration
+
+Jika ingin menjalankan migrasi secara manual:
+
+```bash
+# Run migration up
+docker-compose run --rm migrate up
+
+# Run migration down
+docker-compose run --rm migrate down
+
+# Force migration to specific version
+docker-compose run --rm migrate force <version>
+```
+
+### Development dengan Hot Reload
+
+Untuk development dengan hot reload, gunakan `docker-compose.override.yml`:
+
+```bash
+# Copy example file
+cp docker-compose.override.yml.example docker-compose.override.yml
+
+# Edit sesuai kebutuhan, lalu jalankan
+docker-compose up
+```
+
+### Build Image Manual
+
+```bash
+# Build image
+docker build -t go-arch:latest .
+
+# Run container
+docker run -p 8080:8080 --env-file .env go-arch:latest
+```
+
+### Health Check
+
+Aplikasi menyediakan health check endpoint:
+```bash
+curl http://localhost:8080/health
+```
+
+### Troubleshooting
+
+**Database connection error:**
+- Pastikan PostgreSQL container sudah running: `docker-compose ps`
+- Cek logs: `docker-compose logs postgres`
+- Pastikan environment variables di `.env` sudah benar
+
+**Migration failed:**
+- Cek apakah database sudah ready: `docker-compose logs migrate`
+- Pastikan file migration ada di folder `migrations/`
+- Coba jalankan migration manual: `docker-compose run --rm migrate up`
+
+**Port already in use:**
+- Ubah port di `docker-compose.yml` atau `.env`
+- Atau stop service yang menggunakan port tersebut

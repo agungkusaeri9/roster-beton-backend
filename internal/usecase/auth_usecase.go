@@ -66,7 +66,7 @@ func (uc *authUsecase) Login(username string, password string) (*LoginResult, er
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signed, err := token.SignedString([]byte(uc.jwtSecret))
 	if err != nil {
-		return nil, errors.NewBadRequest("Failed to signing token")
+		return nil, errors.NewInternal("Failed to signing token")
 	}
 
 	return &LoginResult{

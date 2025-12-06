@@ -15,8 +15,20 @@ type AuthHandler struct {
 	uc usecase.AuthUsecase
 }
 
+func (h *AuthHandler) Health(c *gin.Context) {
+	SuccessResponse(c, 200, "Service is healthy", gin.H{
+		"status": "ok",
+		"service": "go-arch",
+	})
+}
+
 func NewAuthHandler(r *gin.Engine, uc usecase.AuthUsecase) {
 	h := &AuthHandler{uc: uc}
+	
+	// Health check endpoint
+	r.GET("/health", h.Health)
+	
+	// Auth endpoints
 	r.POST("/register", h.Register)
 	r.POST("/login", h.Login)
 }
