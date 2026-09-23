@@ -55,6 +55,10 @@ func main() {
 
 	// 🧩 Initialize repository
 	var userRepo repository.UserRepository = pgsqlRepo.NewUserRepoPg(pgdb)
+	var productRepo repository.ProductRepository = pgsqlRepo.NewProductRepoPg(pgdb)
+	var categoryRepo repository.CategoryRepository = pgsqlRepo.NewCategoryRepoPg(pgdb)
+	var galleryRepo repository.GalleryRepository = pgsqlRepo.NewGalleryRepoPg(pgdb)
+	var configRepo repository.ConfigRepository = pgsqlRepo.NewConfigRepoPg(pgdb)
 
 	// 🧩 Get JWT Secret from environment
 	jwtSecret := os.Getenv("JWT_SECRET")
@@ -78,12 +82,41 @@ func main() {
 
 	// 🧩 Initialize usecase
 	authUsecase := usecase.NewAuthUseCase(userRepo, jwtSecret, tokenExpiry)
+	productUsecase := usecase.NewProductUsecase(productRepo)
+	categoryUsecase := usecase.NewCategoryUsecase(categoryRepo)
+	galleryUsecase := usecase.NewGalleryUsecase(galleryRepo)
+	configUsecase := usecase.NewConfigUsecase(configRepo)
 
 	// 🧩 Initialize Gin router
 	r := gin.Default()
 
-	// 🧩 Register handler (controller)
-	handler.NewAuthHandler(r, authUsecase)
+	// 🧩 CORS Middleware
+	r.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, PATCH, DELETE")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	})
+
+	// 🧩 Serve static files for uploads (products, gallery, etc.)
+	r.Static("/uploads", "./uploads")
+
+	// 🧩 API Route Group (/api)
+	api := r.Group("/api")
+
+	// 🧩 Register handlers (controllers)
+	handler.NewAuthHandler(api, authUsecase)
+	handler.NewProductHandler(api, productUsecase)
+	handler.NewCategoryHandler(api, categoryUsecase)
+	handler.NewGalleryHandler(api, galleryUsecase)
+	handler.NewConfigHandler(api, configUsecase)
 
 	// 🧩 (Optional) log semua route terdaftar
 	for _, route := range r.Routes() {

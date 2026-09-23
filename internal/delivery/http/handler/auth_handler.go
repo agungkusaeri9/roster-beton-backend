@@ -22,7 +22,7 @@ func (h *AuthHandler) Health(c *gin.Context) {
 	})
 }
 
-func NewAuthHandler(r *gin.Engine, uc usecase.AuthUsecase) {
+func NewAuthHandler(r *gin.RouterGroup, uc usecase.AuthUsecase) {
 	h := &AuthHandler{uc: uc}
 	
 	// Health check endpoint

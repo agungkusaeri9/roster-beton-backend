@@ -206,7 +206,7 @@ docker run -p 8080:8080 --env-file .env go-arch:latest
 
 Aplikasi menyediakan health check endpoint:
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:8080/api/health
 ```
 
 ### Troubleshooting

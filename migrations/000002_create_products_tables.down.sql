@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS galleries;
+DROP TABLE IF EXISTS seos;
+DROP TABLE IF EXISTS product_galleries;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS categories;
