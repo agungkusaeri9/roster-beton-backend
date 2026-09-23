@@ -1,0 +1,63 @@
+services:
+  # Go Application Backend
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: roster-beton-app
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      # Database Configuration (Point to existing PostgreSQL instance)
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-roster_beton}
+      # JWT Configuration
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
+      TOKEN_EXPIRY: ${TOKEN_EXPIRY:-24h}
+      # Server Configuration
+      PORT: ${PORT:-8080}
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      GIN_MODE: ${GIN_MODE:-release}
+    ports:
+      - "${PORT:-8080}:8080"
+    volumes:
+      - ./uploads:/app/uploads
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 256M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:${PORT:-8080}/api/configs || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Optional Migration Service
+  migrate:
+    image: migrate/migrate:latest
+    container_name: roster-beton-migrate
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command:
+      - "-path"
+      - "/migrations"
+      - "-database"
+      - "postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@${DB_HOST:-host.docker.internal}:${DB_PORT:-5432}/${DB_NAME:-roster_beton}?sslmode=disable"
+      - "up"
+    volumes:
+      - ./migrations:/migrations
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+    restart: "no"

@@ -37,6 +37,9 @@ COPY --from=builder /app/main .
 # Copy migration files
 COPY --from=builder /app/migrations ./migrations
 
+# Create uploads directory
+RUN mkdir -p /app/uploads
+
 # Expose port
 EXPOSE 8080
 

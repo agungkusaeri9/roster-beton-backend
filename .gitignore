@@ -134,7 +134,9 @@ test-results/
 # ==============================
 
 # Docker stuff
-docker-compose.override.yml
+docker-compose*.yml
+!docker-compose.example.yml
+!docker-compose*.example.yml
 .docker/
 .dockerignore
 
